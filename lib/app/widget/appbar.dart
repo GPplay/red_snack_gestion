@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/pages/home.dart';
+import 'package:red_snack_gestion/app/pages/inicio_sesion.dart';
 import 'package:red_snack_gestion/app/pages/inventario.dart';
 import 'package:red_snack_gestion/app/pages/historial_venta_page.dart';
 import 'package:red_snack_gestion/app/pages/usuario_page.dart';
@@ -103,6 +104,10 @@ class SideMenu extends StatelessWidget {
             const SizedBox(height: 100), // Espacio extra
             _buildDrawerItem('Cerrar sesión', () {
               // Accion para cerrar sesión
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
             }, isLogout: true),
           ],
         ),
