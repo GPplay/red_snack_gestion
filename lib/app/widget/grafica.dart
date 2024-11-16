@@ -5,6 +5,7 @@ class TransaccionesEstado extends StatefulWidget {
   const TransaccionesEstado({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _TransaccionesEstadoState createState() => _TransaccionesEstadoState();
 }
 
