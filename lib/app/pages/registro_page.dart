@@ -1,5 +1,6 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
-import 'package:red_snack_gestion/app/models/usuario.dart';
 
 class RegistroUsuario extends StatefulWidget {
   const RegistroUsuario({super.key});
@@ -13,7 +14,8 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
   final _nombreController = TextEditingController();
   final _correoController = TextEditingController();
   final _contrasenaController = TextEditingController();
-  final _idEmprendimiento = TextEditingController();
+  final _codigoAccesoController =
+      TextEditingController(); // Agregué este controlador
   final _nombreEmprendimientoController = TextEditingController();
   final _descripcionEmprendimientoController = TextEditingController();
 
@@ -23,17 +25,20 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
     String nombre = _nombreController.text;
     String correo = _correoController.text;
     String contrasena = _contrasenaController.text;
-    int idEmprendimientoValue = _idEmprendimiento.hashCode;
 
-    Usuario nuevoUsuario = Usuario(
-      nombre: nombre,
-      correo: correo,
-      contrasena: contrasena,
-      idEmprendimiento: idEmprendimientoValue,
-    );
-
-    // ignore: avoid_print
-    print(nuevoUsuario.toJson());
+    // Solo para fines de demostración, imprime los datos en la consola
+    print("Nombre: $nombre");
+    print("Correo: $correo");
+    print("Contraseña: $contrasena");
+    print("Opción seleccionada: $_opcionSeleccionada");
+    if (_opcionSeleccionada == "unir") {
+      print("Código de acceso: ${_codigoAccesoController.text}");
+    } else if (_opcionSeleccionada == "crear") {
+      print(
+          "Nombre del emprendimiento: ${_nombreEmprendimientoController.text}");
+      print(
+          "Descripción del emprendimiento: ${_descripcionEmprendimientoController.text}");
+    }
   }
 
   void _mostrarModalOpciones() {
@@ -100,13 +105,16 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                   onPressed: _mostrarModalOpciones,
                   child: const Text('Unirse/Crear Emprendimiento'),
                 ),
-                if (_opcionSeleccionada == "unirse") ...[
+                // Mostrar campos adicionales según la opción seleccionada
+                if (_opcionSeleccionada == "unir") ...[
+                  const SizedBox(height: 20),
                   TextField(
-                    controller: _idEmprendimiento,
-                    decoration: const InputDecoration(
-                        labelText: 'Agregar ID Emprendimiento'),
+                    controller: _codigoAccesoController,
+                    decoration:
+                        const InputDecoration(labelText: 'Código de Acceso'),
                   ),
                 ] else if (_opcionSeleccionada == "crear") ...[
+                  const SizedBox(height: 20),
                   TextField(
                     controller: _nombreEmprendimientoController,
                     decoration: const InputDecoration(
