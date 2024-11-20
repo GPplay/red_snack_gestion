@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/controller/inventario_controller.dart';
 import 'package:red_snack_gestion/app/models/producto.dart';
 import 'package:red_snack_gestion/app/pages/chat_page.dart';
+import 'package:red_snack_gestion/app/pages/producto_page.dart';
 import 'package:red_snack_gestion/app/widget/appbar.dart'; // Modelo Producto
 
 class InventarioScreen extends StatefulWidget {
@@ -136,8 +137,10 @@ class _InventarioScreenState extends State<InventarioScreen> {
                 ),
                 onTap: () {
                   // Puedes implementar navegación a una página de detalles
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Producto: ${producto.nombre}')),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ProductoPage(producto: producto)),
                   );
                 },
               ),

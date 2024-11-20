@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:red_snack_gestion/app/pages/chat_page.dart';
-import 'package:red_snack_gestion/app/widget/appbar.dart';
+import 'package:red_snack_gestion/app/models/producto.dart';
 
 class ProductoPage extends StatefulWidget {
-  const ProductoPage({super.key});
+  const ProductoPage({super.key, required Producto producto});
 
   @override
   State<ProductoPage> createState() => _ProductoPageState();
@@ -16,8 +15,14 @@ class _ProductoPageState extends State<ProductoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const GlobalAppBar(title: 'Producto', chatPage: Chats()),
-      drawer: const SideMenu(),
+      appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.red,
+        title: const Text(
+          'Producto',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
