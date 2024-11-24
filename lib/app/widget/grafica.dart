@@ -45,7 +45,7 @@ class _TransaccionesEstadoState extends State<TransaccionesEstado> {
               dataSource: chartData,
               xValueMapper: (ChartData data, _) => data.mes,
               yValueMapper: (ChartData data, _) => data.valor1,
-              name: 'perdidas',
+              name: 'Costos',
               color: Colors.red.shade300,
             ),
             ColumnSeries<ChartData, String>(
