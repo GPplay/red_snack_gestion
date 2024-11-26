@@ -41,6 +41,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+<<<<<<< HEAD
+# Ignorar todas las carpetas  
+*/  
+
+# No ignorar la carpeta lib  
+!lib/
+=======
 
 # FVM Version Cache
 .fvm/
+>>>>>>> main

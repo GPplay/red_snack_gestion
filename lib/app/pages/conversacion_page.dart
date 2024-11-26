@@ -34,6 +34,7 @@ class _ConversacionPageState extends State<ConversacionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
         title: Row(
           children: [
             const CircleAvatar(
@@ -42,7 +43,10 @@ class _ConversacionPageState extends State<ConversacionPage> {
               child: Icon(Icons.person, color: Colors.black),
             ),
             const SizedBox(width: 10),
-            Text(widget.nombre), // Muestra el nombre en la barra superior
+            Text(widget.nombre,
+                style: const TextStyle(
+                    color: Colors
+                        .white)), // Muestra el nombre en la barra superior
           ],
         ),
         backgroundColor: Colors.red,
@@ -124,7 +128,8 @@ class _ConversacionPageState extends State<ConversacionPage> {
                       // Lógica para enviar mensaje
                       // ignore: avoid_print
                       print("Mensaje enviado: ${_messageController.text}");
-                      _messageController.clear(); // Limpiar el campo después de enviar
+                      _messageController
+                          .clear(); // Limpiar el campo después de enviar
                     } else {
                       // Lógica para activar el micrófono o grabar
                       // ignore: avoid_print

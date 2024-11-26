@@ -24,7 +24,7 @@ class _HistorialVentasState extends State<HistorialVentas> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const GlobalAppBar(title: 'Historial', chatPage: Chats()),
-      drawer: const SideMenu(), 
+      drawer: const SideMenu(),
       body: ListView.builder(
         itemCount: ventas.length,
         itemBuilder: (context, index) {

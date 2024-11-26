@@ -33,18 +33,21 @@ class _ChatState extends State<Chats> {
                 leading: CircleAvatar(
                   radius: 25,
                   backgroundColor: Colors.grey[300],
-                  child: const Icon(Icons.person, size: 30, color: Colors.black),
+                  child:
+                      const Icon(Icons.person, size: 30, color: Colors.black),
                 ),
                 title: Text(
                   names[index],
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w500),
                 ),
                 onTap: () {
                   // Navegar a la página de conversación cuando se haga clic
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ConversacionPage(nombre: names[index]),
+                      builder: (context) =>
+                          ConversacionPage(nombre: names[index]),
                     ),
                   );
                 },
