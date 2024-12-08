@@ -30,6 +30,9 @@ class InventarioController {
     ),
   ];
 
+  // ignore: prefer_typing_uninitialized_variables
+  static var inventarioController;
+
   /// Función para eliminar un producto de la lista
   void eliminarProducto(int index) {
     if (index >= 0 && index < productos.length) {
@@ -60,4 +63,12 @@ class InventarioController {
     }
     return false;
   }
+
+  void actualizarInventario(int id, int i) {}
+
+  totalVentas() {}
+
+  totalGastos() {}
+
+  totalGanancias() {}
 }

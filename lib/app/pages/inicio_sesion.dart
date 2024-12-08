@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/pages/home.dart';
 import 'package:red_snack_gestion/app/pages/registro_page.dart';
 
-
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
@@ -44,9 +43,9 @@ class LoginScreen extends StatelessWidget {
               onPressed: () {
                 // Aquí va la lógica de inicio de sesión
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen())
-                );
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeScreen()));
               },
               // ignore: sort_child_properties_last
               child: const Text(
@@ -63,14 +62,14 @@ class LoginScreen extends StatelessWidget {
             TextButton(
               onPressed: () {
                 // Navegar a la pantalla de registro
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const RegistroUsuario())
-                );
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const RegistroUsuario()));
               },
               child: Text(
                 '¿No tienes una cuenta? Regístrate',
-                style: TextStyle(
-                  color: Colors.red[400]
-                ),
+                style: TextStyle(color: Colors.red[400]),
               ),
             ),
           ],

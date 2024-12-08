@@ -1,56 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:red_snack_gestion/app/controller/inventario_controller.dart';
+import 'package:red_snack_gestion/app/models/producto.dart';
 import 'package:red_snack_gestion/app/pages/chat_page.dart';
 import 'package:red_snack_gestion/app/widget/appbar.dart';
 import 'package:red_snack_gestion/app/widget/grafica.dart';
-import 'package:red_snack_gestion/app/widget/tarjetas.dart'; // Biblioteca para gráficos de barras
+import 'package:red_snack_gestion/app/widget/tarjetas.dart';
+import 'dart:developer';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const GlobalAppBar(title: 'Inicio', chatPage: Chats()),
-      drawer: const SideMenu(),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Usa Expanded o Flexible para el gráfico
-            Expanded(
-              child: TransaccionesEstado(),
-            ),
-            SizedBox(height: 5),
-            // Tarjetas con ventas, gastos, ganancias
-            Tarjetas(text: 'Ventas:'),
-            SizedBox(height: 10),
-            Tarjetas(text: 'Gastos: '),
-            SizedBox(height: 10),
-            Tarjetas(text: 'Ganancias: '),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Mostrar el diálogo para agregar venta
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return _buildAddSaleDialog(context);
-            },
-          );
-        },
-        // ignore: sort_child_properties_last
-        child: const Icon(Icons.add),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
+  HomeScreenState createState() => HomeScreenState();
+}
 
-  // Método para construir el diálogo de agregar venta
+class HomeScreenState extends State<HomeScreen> {
+  final InventarioController inventarioController = InventarioController();
+
   Widget _buildAddSaleDialog(BuildContext context) {
-    String? selectedProduct;
+    Producto? selectedProduct;
     final TextEditingController productCountController =
         TextEditingController();
 
@@ -61,7 +29,7 @@ class HomeScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Desplegable para seleccionar el producto
-          DropdownButtonFormField<String>(
+          DropdownButtonFormField<Producto>(
             decoration: InputDecoration(
               labelText: 'Seleccione el producto',
               border: OutlineInputBorder(
@@ -69,18 +37,14 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             value: selectedProduct, // Valor inicial
-            items: <String>[
-              'Producto 1',
-              'Producto 2',
-              'Producto 3'
-            ] // Opciones de productos
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
+            items: inventarioController.productos
+                .map<DropdownMenuItem<Producto>>((producto) {
+              return DropdownMenuItem<Producto>(
+                value: producto,
+                child: Text(producto.nombre),
               );
             }).toList(),
-            onChanged: (String? newValue) {
+            onChanged: (Producto? newValue) {
               selectedProduct = newValue; // Guardar el producto seleccionado
             },
           ),
@@ -101,13 +65,33 @@ class HomeScreen extends StatelessWidget {
       actions: [
         ElevatedButton(
           onPressed: () {
-            // Lógica para agregar la venta
+            // Validación de los datos
             if (selectedProduct != null &&
                 productCountController.text.isNotEmpty) {
-              // Aquí puedes hacer la validación o enviar la información al backend
-              Navigator.of(context).pop(); // Cerrar el diálogo
+              final int cantidadSolicitada =
+                  int.tryParse(productCountController.text) ?? 0;
+
+              if (cantidadSolicitada > 0 &&
+                  cantidadSolicitada <= selectedProduct!.cantidadInventario) {
+                // Actualizar inventario
+                setState(() {
+                  inventarioController.actualizarInventario(selectedProduct!.id,
+                      selectedProduct!.cantidadInventario - cantidadSolicitada);
+                });
+
+                log('Venta registrada: ${selectedProduct!.nombre}, Cantidad: $cantidadSolicitada');
+                Navigator.of(context).pop(); // Cerrar el diálogo
+              } else {
+                // Mostrar error si no hay suficiente inventario
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        'Inventario insuficiente. Disponible: ${selectedProduct!.cantidadInventario}'),
+                  ),
+                );
+              }
             } else {
-              // Mostrar algún mensaje de error si falta seleccionar producto o ingresar cantidad
+              // Mostrar mensaje de error si faltan datos
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                     content: Text(
@@ -118,6 +102,43 @@ class HomeScreen extends StatelessWidget {
           child: const Text('Agregar'),
         ),
       ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const GlobalAppBar(title: 'Inicio', chatPage: Chats()),
+      drawer: const SideMenu(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Expanded(
+              child: TransaccionesEstado(),
+            ),
+            const SizedBox(height: 5),
+            Tarjetas(text: 'Ventas: ${inventarioController.totalVentas()}'),
+            const SizedBox(height: 10),
+            Tarjetas(text: 'Gastos: ${inventarioController.totalGastos()}'),
+            const SizedBox(height: 10),
+            Tarjetas(
+                text: 'Ganancias: ${inventarioController.totalGanancias()}'),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Usar showDialog para mostrar el diálogo
+          showDialog(
+            context: context,
+            builder: (context) => _buildAddSaleDialog(context),
+          );
+        },
+        backgroundColor: Colors.red,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
