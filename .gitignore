@@ -46,3 +46,4 @@ app.*.map.json
 
 # No ignorar la carpeta lib  
 !lib/
+!lib/**
