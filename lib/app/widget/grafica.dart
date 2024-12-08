@@ -29,8 +29,8 @@ class _TransaccionesEstadoState extends State<TransaccionesEstado> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gráfica de Transacciones'),
-      ),
+          title: const Text('Grafica de transacciones'),
+          automaticallyImplyLeading: false),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SfCartesianChart(
