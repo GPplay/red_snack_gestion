@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/pages/home.dart';
 import 'package:red_snack_gestion/app/pages/inicio_sesion.dart';
-import 'package:red_snack_gestion/app/pages/inventario.dart';
+import 'package:red_snack_gestion/app/pages/inventario_page.dart';
 import 'package:red_snack_gestion/app/pages/historial_venta_page.dart';
 import 'package:red_snack_gestion/app/pages/usuario_page.dart';
 
