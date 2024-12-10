@@ -22,6 +22,13 @@ class _TransaccionesEstadoState extends State<TransaccionesEstado> {
       ChartData('Mar', 70, 85),
       ChartData('Abr', 50, 60),
       ChartData('May', 100, 120),
+      ChartData('Jun', 90, 110),
+      ChartData('Jul', 80, 100),
+      ChartData('Ago', 70, 90),
+      ChartData('Sep', 60, 80),
+      ChartData('Oct', 50, 70),
+      ChartData('Nov', 40, 60),
+      ChartData('Dic', 30, 50),
     ];
   }
 
