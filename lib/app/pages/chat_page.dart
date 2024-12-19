@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/pages/conversacion_page.dart'; // Importar la nueva página de conversación
 import 'package:red_snack_gestion/app/widget/appbar.dart';
-import 'package:red_snack_gestion/app/widget/perfil.dart'; // Importar el widget ImagenPerfil
+import 'package:red_snack_gestion/app/widget/perfil.dart';
 
 class Chats extends StatefulWidget {
   const Chats({super.key});
@@ -19,6 +19,9 @@ class _ChatState extends State<Chats> {
     'Nombre 5',
     'Nombre 6',
     'Nombre 7',
+    'Nombre 8',
+    'Nombre 9',
+    'Nombre 10',
   ];
 
   @override
@@ -33,9 +36,9 @@ class _ChatState extends State<Chats> {
             children: [
               ListTile(
                 leading: ImagenPerfil(
-                  backgroundColor: Colors.grey[300]!,
-                  iconColor: Colors.black,
-                  textColor: Colors.black,
+                  backgroundColor: Colors.blue[100] ?? Colors.blue,
+                  iconColor: Colors.blue,
+                  textColor: Colors.blue[900] ?? Colors.blue,
                 ),
                 title: Text(
                   names[index],
