@@ -3,6 +3,7 @@ import 'package:red_snack_gestion/app/pages/chat_page.dart';
 import 'package:red_snack_gestion/app/widget/appbar.dart';
 import 'package:red_snack_gestion/app/widget/contrasena.dart';
 import 'package:red_snack_gestion/app/widget/correo.dart';
+import 'package:red_snack_gestion/app/widget/perfil.dart';
 
 class UsuarioPage extends StatefulWidget {
   const UsuarioPage({super.key});
@@ -33,29 +34,7 @@ class _UsuarioPageState extends State<UsuarioPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Imagen de perfil y nombre
-              Center(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.purple[100],
-                      child: const Icon(
-                        Icons.person,
-                        size: 60,
-                        color: Colors.purple,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'NOMBRE',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const ImagenPerfil(),
               const SizedBox(height: 30),
               // Información del usuario
               Container(
