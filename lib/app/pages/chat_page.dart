@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/pages/conversacion_page.dart'; // Importar la nueva página de conversación
 import 'package:red_snack_gestion/app/widget/appbar.dart';
-import 'package:red_snack_gestion/app/widget/perfil.dart';
 
 class Chats extends StatefulWidget {
   const Chats({super.key});
@@ -35,10 +34,11 @@ class _ChatState extends State<Chats> {
           return Column(
             children: [
               ListTile(
-                leading: ImagenPerfil(
-                  backgroundColor: Colors.blue[100] ?? Colors.blue,
-                  iconColor: Colors.blue,
-                  textColor: Colors.blue[900] ?? Colors.blue,
+                leading: CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.grey[300],
+                  child:
+                      const Icon(Icons.person, size: 30, color: Colors.black),
                 ),
                 title: Text(
                   names[index],
