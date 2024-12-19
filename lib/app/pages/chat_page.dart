@@ -34,6 +34,7 @@ class _ChatState extends State<Chats> {
           return Column(
             children: [
               ListTile(
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 leading: CircleAvatar(
                   radius: 25,
                   backgroundColor: Colors.grey[300],
@@ -56,7 +57,8 @@ class _ChatState extends State<Chats> {
                   );
                 },
               ),
-              const Divider(height: 1, color: Colors.grey),
+              const SizedBox(height: 10),
+              const Divider(height: 2, color: Colors.grey),
             ],
           );
         },
