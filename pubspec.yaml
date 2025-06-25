@@ -44,10 +44,19 @@ dependencies:
   syncfusion_flutter_charts: ^27.2.2
   flutter_bloc: ^8.1.6
   equatable: ^2.0.7
+  flutter_lints: ^5.0.0
+  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/ICONO.png"
+  min_sdk_android: 21
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
