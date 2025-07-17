@@ -26,11 +26,6 @@ class _InventarioScreenState extends State<InventarioScreen> {
         {'nombre': 'nombre', 'label': 'Nombre del producto'},
         {'nombre': 'descripcion', 'label': 'Descripción'},
         {
-          'nombre': 'cantidad',
-          'label': 'Cantidad en inventario',
-          'tipo': TextInputType.number
-        },
-        {
           'nombre': 'costo',
           'label': 'Costo de fabricación',
           'tipo': TextInputType.number
