@@ -103,8 +103,7 @@ class _ProductoPageState extends State<ProductoPage> {
       titulo: "Agregar a Inventario",
       preguntas: [
         {
-          'nombre':
-              'cantidad', // Nombre del campo para identificar el resultado
+          'nombre':'cantidad', // Nombre del campo para identificar el resultado
           'label': 'Agregar número',
           'tipo': TextInputType.number,
           'hint': 'Ingresa una cantidad',

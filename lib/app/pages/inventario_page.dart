@@ -4,6 +4,7 @@ import 'package:red_snack_gestion/app/models/producto.dart';
 import 'package:red_snack_gestion/app/pages/chat_page.dart';
 import 'package:red_snack_gestion/app/pages/producto_page.dart';
 import 'package:red_snack_gestion/app/widget/appbar.dart';
+import 'package:red_snack_gestion/app/widget/boton_flotante.dart';
 import 'package:red_snack_gestion/app/widget/formulario.dart';
 
 class InventarioScreen extends StatefulWidget {
@@ -23,6 +24,12 @@ class _InventarioScreenState extends State<InventarioScreen> {
       titulo: 'Agregar Producto',
       preguntas: [
         {'nombre': 'nombre', 'label': 'Nombre del producto'},
+        {'nombre': 'descripcion', 'label': 'Descripción'},
+        {
+          'nombre': 'cantidad',
+          'label': 'Cantidad en inventario',
+          'tipo': TextInputType.number
+        },
         {
           'nombre': 'costo',
           'label': 'Costo de fabricación',
@@ -31,11 +38,6 @@ class _InventarioScreenState extends State<InventarioScreen> {
         {
           'nombre': 'precio',
           'label': 'Precio de venta',
-          'tipo': TextInputType.number
-        },
-        {
-          'nombre': 'cantidad',
-          'label': 'Cantidad en inventario',
           'tipo': TextInputType.number
         },
       ],
@@ -118,11 +120,8 @@ class _InventarioScreenState extends State<InventarioScreen> {
           }).toList(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: CustomFloatingActionButton(
         onPressed: _mostrarDialogoAgregarProducto,
-        // ignore: sort_child_properties_last
-        child: const Icon(Icons.add),
-        backgroundColor: Colors.red,
       ),
     );
   }

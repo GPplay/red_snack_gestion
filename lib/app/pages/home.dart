@@ -3,6 +3,7 @@ import 'package:red_snack_gestion/app/controller/inventario_controller.dart';
 import 'package:red_snack_gestion/app/models/producto.dart';
 import 'package:red_snack_gestion/app/pages/chat_page.dart';
 import 'package:red_snack_gestion/app/widget/appbar.dart';
+import 'package:red_snack_gestion/app/widget/boton_flotante.dart';
 import 'package:red_snack_gestion/app/widget/grafica.dart';
 import 'package:red_snack_gestion/app/widget/tarjetas.dart';
 import 'dart:developer';
@@ -128,16 +129,15 @@ class HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: CustomFloatingActionButton(
         onPressed: () {
-          // Usar showDialog para mostrar el diálogo
           showDialog(
             context: context,
-            builder: (context) => _buildAddSaleDialog(context),
+            builder: (BuildContext context) {
+              return _buildAddSaleDialog(context);
+            },
           );
         },
-        backgroundColor: Colors.red,
-        child: const Icon(Icons.add),
       ),
     );
   }
