@@ -23,8 +23,16 @@ class _InventarioScreenState extends State<InventarioScreen> {
       context: context,
       titulo: 'Agregar Producto',
       preguntas: [
-        {'nombre': 'nombre', 'label': 'Nombre del producto'},
-        {'nombre': 'descripcion', 'label': 'Descripción'},
+        {
+          'nombre': 'nombre',
+          'label': 'Nombre del producto',
+          'tipo': TextInputType.text
+        },
+        {
+          'nombre': 'descripcion',
+          'label': 'Descripción',
+          'tipo': TextInputType.text
+        },
         {
           'nombre': 'costo',
           'label': 'Costo de fabricación',
