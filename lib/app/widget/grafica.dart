@@ -17,12 +17,12 @@ class _TransaccionesEstadoState extends State<TransaccionesEstado> {
     super.initState();
     // Inicializamos datos de ejemplo
     chartData = [
-      ChartData('Ene', 80, 100),
+      ChartData('Ene', 8000000, 100),
       ChartData('Feb', 40, 90),
       ChartData('Mar', 70, 85),
       ChartData('Abr', 50, 60),
       ChartData('May', 100, 120),
-      ChartData('Jun', 90, 110),
+      ChartData('Jun', 90, 1100000),
       ChartData('Jul', 80, 100),
       ChartData('Ago', 70, 90),
       ChartData('Sep', 60, 80),
