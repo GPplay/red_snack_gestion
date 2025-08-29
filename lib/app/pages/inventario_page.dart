@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/controller/inventario_controller.dart';
 import 'package:red_snack_gestion/app/models/producto.dart';
+import 'package:red_snack_gestion/app/models/inventario_producto.dart';
 import 'package:red_snack_gestion/app/pages/chat_page.dart';
 import 'package:red_snack_gestion/app/pages/producto_page.dart';
 import 'package:red_snack_gestion/app/widget/appbar.dart';
@@ -18,7 +19,6 @@ class _InventarioScreenState extends State<InventarioScreen> {
   final InventarioController controller = InventarioController();
 
   void _mostrarDialogoAgregarProducto() async {
-    // Mostrar el formulario dinámico
     final resultado = await FormularioDinamico.mostrarFormulario(
       context: context,
       titulo: 'Agregar Producto',
@@ -43,6 +43,11 @@ class _InventarioScreenState extends State<InventarioScreen> {
           'label': 'Precio de venta',
           'tipo': TextInputType.number
         },
+        {
+          'nombre': 'cantidad',
+          'label': 'Cantidad inicial en inventario',
+          'tipo': TextInputType.number
+        },
       ],
       textoBoton: 'Agregar',
       colorBoton: Colors.red,
@@ -52,25 +57,39 @@ class _InventarioScreenState extends State<InventarioScreen> {
     );
 
     if (resultado != null) {
-      // Validar y agregar el producto al controlador
       final String nombre = resultado['nombre'] ?? '';
-      final double costo = double.tryParse(resultado['costo'] ?? '0') ?? 0.0;
-      final double precio = double.tryParse(resultado['precio'] ?? '0') ?? 0.0;
-      final int cantidad = int.tryParse(resultado['cantidad'] ?? '0') ?? 0;
+      final String descripcion = resultado['descripcion'] ?? '';
+      final double costo =
+          double.tryParse(resultado['costo'] ?? '0') ?? 0.0;
+      final double precio =
+          double.tryParse(resultado['precio'] ?? '0') ?? 0.0;
+      final int cantidad =
+          int.tryParse(resultado['cantidad'] ?? '0') ?? 0;
 
       if (nombre.isNotEmpty && costo > 0 && precio > 0 && cantidad > 0) {
+        // Crear el Producto
         final producto = Producto(
-          id: controller.productos.length + 1, // Generar un ID incremental
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
           nombre: nombre,
-          cantidadInventario: cantidad,
-          precioUnitario: precio,
+          descripcion: descripcion,
           costoFabricacion: costo,
-          emprendimientoId: 1, // Ajustar según la lógica de negocio
+          precioVenta: precio,
+          emprendimientoId: "1", // Ajustar según tu lógica
         );
 
-        controller
-            .agregarProducto(producto); // Agregar el producto al controlador
-        setState(() {}); // Actualizar la UI
+        // Crear el InventarioProducto asociado
+        final inventarioProducto = InventarioProducto(
+          id: DateTime.now().microsecondsSinceEpoch.toString(),
+          inventarioId: "1", // Ajustar según tu lógica
+          productoId: producto.id,
+          cantidad: cantidad,
+          fechaActualizacion: DateTime.now(),
+          costoActualEnStock: costo * cantidad,
+          producto: producto,
+        );
+
+        controller.agregarProducto(inventarioProducto);
+        setState(() {});
       }
     }
   }
@@ -82,7 +101,8 @@ class _InventarioScreenState extends State<InventarioScreen> {
       drawer: const SideMenu(),
       body: SingleChildScrollView(
         child: Column(
-          children: controller.productos.map((producto) {
+          children: controller.inventario.map((item) {
+            final producto = item.producto;
             return Card(
               margin: const EdgeInsets.all(8.0),
               child: ListTile(
@@ -94,11 +114,12 @@ class _InventarioScreenState extends State<InventarioScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                        'Costo de fabricación: \$${producto.costoFabricacion?.toStringAsFixed(2) ?? "N/A"}'),
+                        'Descripción: ${producto.descripcion ?? "Sin descripción"}'),
                     Text(
-                        'Precio de venta: \$${producto.precioUnitario.toStringAsFixed(2)}'),
+                        'Costo de fabricación: \$${producto.costoFabricacion.toStringAsFixed(2)}'),
                     Text(
-                        'Cantidad en inventario: ${producto.cantidadInventario}'),
+                        'Precio de venta: \$${producto.precioVenta.toStringAsFixed(2)}'),
+                    Text('Cantidad en inventario: ${item.cantidad}'),
                   ],
                 ),
                 trailing: IconButton(
@@ -106,16 +127,18 @@ class _InventarioScreenState extends State<InventarioScreen> {
                   onPressed: () {
                     setState(() {
                       controller.eliminarProducto(
-                          controller.productos.indexOf(producto));
+                          controller.inventario.indexOf(item));
                     });
                   },
                 ),
                 onTap: () {
-                  // Navegación a una página de detalles
+                  // Navegación a la página de detalles de producto
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ProductoPage(producto: producto)),
+                      builder: (context) =>
+                          ProductoPage(producto: producto),
+                    ),
                   );
                 },
               ),

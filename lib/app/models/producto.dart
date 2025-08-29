@@ -1,42 +1,34 @@
 class Producto {
-  int id; // Clave primaria
+  String id;
   String nombre;
-  int cantidadInventario;
-  double precioUnitario;
-  int emprendimientoId; // ID del emprendimiento asociado
-  double? costoFabricacion; // Propiedad opcional
+  String? descripcion;
+  double costoFabricacion;
+  double precioVenta;
+  String emprendimientoId;
 
-  // Constructor
-  Producto({
-    required this.id,
-    required this.nombre,
-    required this.cantidadInventario,
-    required this.precioUnitario,
-    required this.emprendimientoId,
-    this.costoFabricacion,
-  });
+  Producto(
+      {required this.id,
+      required this.nombre,
+      this.descripcion,
+      required this.costoFabricacion,
+      required this.precioVenta,
+      required this.emprendimientoId});
 
-  // Método para convertir a JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'nombre': nombre,
-      'cantidadInventario': cantidadInventario,
-      'precioUnitario': precioUnitario,
-      'emprendimientoId': emprendimientoId,
-      'costoFabricacion': costoFabricacion,
-    };
-  }
+  factory Producto.fromJson(Map<String, dynamic> json) => Producto(
+        id: json['id'],
+        nombre: json['nombre'],
+        descripcion: json['descripcion'],
+        costoFabricacion: (json['costoFabricacion'] as num).toDouble(),
+        precioVenta: (json['precioVenta'] as num).toDouble(),
+        emprendimientoId: json['emprendimientoId'],
+      );
 
-  // Método para crear una instancia de Producto desde un JSON
-  factory Producto.fromJson(Map<String, dynamic> json) {
-    return Producto(
-      id: json['id'],
-      nombre: json['nombre'],
-      cantidadInventario: json['cantidadInventario'],
-      precioUnitario: json['precioUnitario'].toDouble(),
-      emprendimientoId: json['emprendimientoId'],
-      costoFabricacion: json['costoFabricacion']?.toDouble(),
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'nombre': nombre,
+        'descripcion': descripcion,
+        'costoFabricacion': costoFabricacion,
+        'precioVenta': precioVenta,
+        'emprendimientoId': emprendimientoId,
+      };
 }

@@ -1,34 +1,19 @@
 class Emprendimiento {
-  int id; // Clave primaria
+  String id;
   String nombre;
-  String? descripcion; // Propiedad opcional
-  String codigoAcceso;
+  String? descripcion;
 
-  // Constructor
-  Emprendimiento({
-    required this.id,
-    required this.nombre,
-    this.descripcion,
-    required this.codigoAcceso,
-  });
+  Emprendimiento({required this.id, required this.nombre, this.descripcion});
 
-  // Método para convertir a JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'nombre': nombre,
-      'descripcion': descripcion,
-      'codigoAcceso': codigoAcceso,
-    };
-  }
+  factory Emprendimiento.fromJson(Map<String, dynamic> json) => Emprendimiento(
+        id: json['id'],
+        nombre: json['nombre'],
+        descripcion: json['descripcion'],
+      );
 
-  // Método para crear una instancia de Emprendimiento desde un JSON
-  factory Emprendimiento.fromJson(Map<String, dynamic> json) {
-    return Emprendimiento(
-      id: json['id'],
-      nombre: json['nombre'],
-      descripcion: json['descripcion'],
-      codigoAcceso: json['codigoAcceso'],
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'nombre': nombre,
+        'descripcion': descripcion,
+      };
 }

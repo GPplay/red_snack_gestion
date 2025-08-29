@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/controller/inventario_controller.dart';
-import 'package:red_snack_gestion/app/models/producto.dart';
+import 'package:red_snack_gestion/app/models/inventario_producto.dart';
 import 'package:red_snack_gestion/app/pages/chat_page.dart';
 import 'package:red_snack_gestion/app/widget/appbar.dart';
 import 'package:red_snack_gestion/app/widget/boton_flotante.dart';
@@ -19,7 +19,7 @@ class HomeScreenState extends State<HomeScreen> {
   final InventarioController inventarioController = InventarioController();
 
   Widget _buildAddSaleDialog(BuildContext context) {
-    Producto? selectedProduct;
+    InventarioProducto? selectedItem;
     final TextEditingController productCountController =
         TextEditingController();
 
@@ -30,23 +30,25 @@ class HomeScreenState extends State<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Desplegable para seleccionar el producto
-          DropdownButtonFormField<Producto>(
+          DropdownButtonFormField<InventarioProducto>(
             decoration: InputDecoration(
               labelText: 'Seleccione el producto',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            value: selectedProduct, // Valor inicial
-            items: inventarioController.productos
-                .map<DropdownMenuItem<Producto>>((producto) {
-              return DropdownMenuItem<Producto>(
-                value: producto,
-                child: Text(producto.nombre),
+            value: selectedItem,
+            items: inventarioController.inventario
+                .map<DropdownMenuItem<InventarioProducto>>((item) {
+              return DropdownMenuItem<InventarioProducto>(
+                value: item,
+                child: Text(item.producto.nombre),
               );
             }).toList(),
-            onChanged: (Producto? newValue) {
-              selectedProduct = newValue; // Guardar el producto seleccionado
+            onChanged: (InventarioProducto? newValue) {
+              setState(() {
+                selectedItem = newValue;
+              });
             },
           ),
           const SizedBox(height: 10),
@@ -54,45 +56,46 @@ class HomeScreenState extends State<HomeScreen> {
           TextField(
             controller: productCountController,
             decoration: InputDecoration(
-              labelText: 'Numero de productos',
+              labelText: 'Número de productos',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            keyboardType: TextInputType.number, // Permitir solo números
+            keyboardType: TextInputType.number,
           ),
         ],
       ),
       actions: [
         ElevatedButton(
           onPressed: () {
-            // Validación de los datos
-            if (selectedProduct != null &&
+            if (selectedItem != null &&
                 productCountController.text.isNotEmpty) {
               final int cantidadSolicitada =
                   int.tryParse(productCountController.text) ?? 0;
 
               if (cantidadSolicitada > 0 &&
-                  cantidadSolicitada <= selectedProduct!.cantidadInventario) {
+                  cantidadSolicitada <= selectedItem!.cantidad) {
                 // Actualizar inventario
                 setState(() {
-                  inventarioController.actualizarInventario(selectedProduct!.id,
-                      selectedProduct!.cantidadInventario - cantidadSolicitada);
+                  inventarioController.actualizarInventario(
+                    selectedItem!.productoId,
+                    selectedItem!.cantidad - cantidadSolicitada,
+                  );
                 });
 
-                log('Venta registrada: ${selectedProduct!.nombre}, Cantidad: $cantidadSolicitada');
-                Navigator.of(context).pop(); // Cerrar el diálogo
+                log('Venta registrada: ${selectedItem!.producto.nombre}, '
+                    'Cantidad: $cantidadSolicitada');
+                Navigator.of(context).pop();
               } else {
                 // Mostrar error si no hay suficiente inventario
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                        'Inventario insuficiente. Disponible: ${selectedProduct!.cantidadInventario}'),
+                        'Inventario insuficiente. Disponible: ${selectedItem!.cantidad}'),
                   ),
                 );
               }
             } else {
-              // Mostrar mensaje de error si faltan datos
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                     content: Text(
@@ -117,15 +120,20 @@ class HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Expanded(
-              child: TransaccionesEstado(),
+              child: TransaccionesEstado(), // <- tu widget de gráfica/estado
             ),
             const SizedBox(height: 5),
-            Tarjetas(text: 'Ventas: ${inventarioController.totalVentas()}'),
-            const SizedBox(height: 10),
-            Tarjetas(text: 'Gastos: ${inventarioController.totalGastos()}'),
+            Tarjetas(
+                text:
+                    'Ventas: \$${inventarioController.totalVentas().toStringAsFixed(2)}'),
             const SizedBox(height: 10),
             Tarjetas(
-                text: 'Ganancias: ${inventarioController.totalGanancias()}'),
+                text:
+                    'Gastos: \$${inventarioController.totalGastos().toStringAsFixed(2)}'),
+            const SizedBox(height: 10),
+            Tarjetas(
+                text:
+                    'Ganancias: \$${inventarioController.totalGanancias().toStringAsFixed(2)}'),
           ],
         ),
       ),

@@ -1,74 +1,100 @@
 import 'package:red_snack_gestion/app/models/producto.dart';
-import 'package:http/http.dart' as http;
+import 'package:red_snack_gestion/app/models/inventario_producto.dart';
 
 class InventarioController {
-  // Lista de productos inicializada con algunos valores por defecto
-  List<Producto> productos = [
-    Producto(
-      id: 1,
-      nombre: 'Chips Papas',
-      cantidadInventario: 100,
-      precioUnitario: 1.00,
-      costoFabricacion: 0.50,
-      emprendimientoId: 1,
+  // Lista inicial de inventario con productos
+  List<InventarioProducto> inventario = [
+    InventarioProducto(
+      id: "1",
+      inventarioId: "1",
+      productoId: "p1",
+      cantidad: 100,
+      fechaActualizacion: DateTime.now(),
+      costoActualEnStock: 50,
+      producto: Producto(
+        id: "p1",
+        nombre: 'Chips Papas',
+        descripcion: 'Papas fritas clásicas',
+        costoFabricacion: 0.50,
+        precioVenta: 1.00,
+        emprendimientoId: "1",
+      ),
     ),
-    Producto(
-      id: 2,
-      nombre: 'Refresco Cola',
-      cantidadInventario: 50,
-      precioUnitario: 1.20,
-      costoFabricacion: 0.30,
-      emprendimientoId: 1,
+    InventarioProducto(
+      id: "2",
+      inventarioId: "1",
+      productoId: "p2",
+      cantidad: 50,
+      fechaActualizacion: DateTime.now(),
+      costoActualEnStock: 15,
+      producto: Producto(
+        id: "p2",
+        nombre: 'Refresco Cola',
+        descripcion: 'Bebida gaseosa 350ml',
+        costoFabricacion: 0.30,
+        precioVenta: 1.20,
+        emprendimientoId: "1",
+      ),
     ),
-    Producto(
-      id: 3,
-      nombre: 'Chocolate Bar',
-      cantidadInventario: 75,
-      precioUnitario: 1.50,
-      costoFabricacion: 0.80,
-      emprendimientoId: 1,
+    InventarioProducto(
+      id: "3",
+      inventarioId: "1",
+      productoId: "p3",
+      cantidad: 75,
+      fechaActualizacion: DateTime.now(),
+      costoActualEnStock: 60,
+      producto: Producto(
+        id: "p3",
+        nombre: 'Chocolate Bar',
+        descripcion: 'Barra de chocolate 40g',
+        costoFabricacion: 0.80,
+        precioVenta: 1.50,
+        emprendimientoId: "1",
+      ),
     ),
   ];
 
-  // ignore: prefer_typing_uninitialized_variables
-  static var inventarioController;
+  /// Agregar producto al inventario
+  void agregarProducto(InventarioProducto inventarioProducto) {
+    inventario.add(inventarioProducto);
+  }
 
-  /// Función para eliminar un producto de la lista
+  /// Eliminar producto del inventario por índice
   void eliminarProducto(int index) {
-    if (index >= 0 && index < productos.length) {
-      productos.removeAt(index);
+    if (index >= 0 && index < inventario.length) {
+      inventario.removeAt(index);
     }
   }
 
-  /// Función para agregar un producto a la lista
-  void agregarProducto(Producto producto) {
-    productos.add(producto);
+  /// Actualizar cantidad de un producto en inventario
+  void actualizarInventario(String productoId, int nuevaCantidad) {
+    final item = inventario.firstWhere(
+      (i) => i.productoId == productoId,
+      orElse: () => throw Exception("Producto no encontrado"),
+    );
+
+    item.cantidad = nuevaCantidad;
+    item.fechaActualizacion = DateTime.now();
   }
 
-  /// Función para verificar si una imagen tiene dimensiones mayores a 500px
-  Future<bool> esImagenMayorA500px(String url) async {
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        int? width = int.tryParse(response.headers['content-width'] ?? '0');
-        int? height = int.tryParse(response.headers['content-height'] ?? '0');
-        if (width != null && height != null && (width > 500 || height > 500)) {
-          return true;
-        }
-      }
-    } catch (e) {
-      // Captura de errores y se asume que no se puede mostrar la imagen
-      // ignore: avoid_print
-      print('Error verificando la imagen: $e');
-    }
-    return false;
+  /// Calcular el total de ventas (precioVenta * cantidad en inventario)
+  double totalVentas() {
+    return inventario.fold(
+      0,
+      (sum, item) => sum + (item.producto.precioVenta * item.cantidad),
+    );
   }
 
-  void actualizarInventario(int id, int i) {}
+  /// Calcular el total de gastos de fabricación
+  double totalGastos() {
+    return inventario.fold(
+      0,
+      (sum, item) => sum + (item.producto.costoFabricacion * item.cantidad),
+    );
+  }
 
-  totalVentas() {}
-
-  totalGastos() {}
-
-  totalGanancias() {}
+  /// Calcular ganancias (Ventas - Gastos)
+  double totalGanancias() {
+    return totalVentas() - totalGastos();
+  }
 }
