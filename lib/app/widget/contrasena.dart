@@ -6,11 +6,11 @@ class PasswordFields extends StatelessWidget {
   final TextEditingController confirmPasswordController;
 
   const PasswordFields({
-    Key? key,
+    super.key,
     required this.oldPasswordController,
     required this.newPasswordController,
     required this.confirmPasswordController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

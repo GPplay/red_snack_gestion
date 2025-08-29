@@ -4,9 +4,9 @@ class EmailFields extends StatelessWidget {
   final TextEditingController emailController;
 
   const EmailFields({
-    Key? key,
+    super.key,
     required this.emailController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
