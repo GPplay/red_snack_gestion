@@ -1,9 +1,42 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/pages/home.dart';
 import 'package:red_snack_gestion/app/pages/registro_page.dart';
+import 'package:red_snack_gestion/app/services/api_services.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final emailCtrl = TextEditingController();
+  final passCtrl = TextEditingController();
+  final apiService = ApiService();
+
+  bool loading = false;
+
+  void _login() async {
+    setState(() => loading = true);
+
+    bool success = await apiService.login(emailCtrl.text, passCtrl.text);
+
+    setState(() => loading = false);
+
+    if (success) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Correo o contraseña incorrectos")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +48,7 @@ class LoginScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const Text(
-              'Bienvenido a Red Snack gestion',
+              'Bienvenido a Red Snack gestión',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 24.0,
@@ -24,15 +57,17 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20.0),
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: emailCtrl,
+              decoration: const InputDecoration(
                 labelText: 'Correo Electrónico',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 10.0),
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: passCtrl,
+              decoration: const InputDecoration(
                 labelText: 'Contraseña',
                 border: OutlineInputBorder(),
               ),
@@ -40,32 +75,22 @@ class LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: () {
-                // Aquí va la lógica de inicio de sesión
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const HomeScreen()));
-              },
-              // ignore: sort_child_properties_last
-              child: const Text(
-                'Iniciar Sesión',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
+              onPressed: loading ? null : _login,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: loading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text(
+                      'Iniciar Sesión',
+                      style: TextStyle(color: Colors.white),
+                    ),
             ),
             const SizedBox(height: 10.0),
             TextButton(
               onPressed: () {
-                // Navegar a la pantalla de registro
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const RegistroUsuario()));
+                  context,
+                  MaterialPageRoute(builder: (_) => const RegistroUsuario()),
+                );
               },
               child: Text(
                 '¿No tienes una cuenta? Regístrate',
