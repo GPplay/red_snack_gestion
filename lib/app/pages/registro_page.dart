@@ -1,6 +1,8 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+
+import 'package:red_snack_gestion/app/services/api_services.dart';
 import 'package:red_snack_gestion/app/widget/campo_texto.dart';
 import 'package:red_snack_gestion/app/widget/campos_adicionales.dart';
 import 'package:red_snack_gestion/app/widget/modal.dart';
@@ -22,19 +24,39 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
 
   String? _opcionSeleccionada;
 
-  void _registrarUsuario() {
-    print("Nombre: ${_nombreController.text}");
-    print("Correo: ${_correoController.text}");
-    print("Contraseña: ${_contrasenaController.text}");
-    print("Opción seleccionada: $_opcionSeleccionada");
+  final ApiService apiService = ApiService();
+  bool loading = false;
 
-    if (_opcionSeleccionada == "unir") {
-      print("Código de acceso: ${_codigoAccesoController.text}");
-    } else if (_opcionSeleccionada == "crear") {
-      print(
-          "Nombre del emprendimiento: ${_nombreEmprendimientoController.text}");
-      print(
-          "Descripción del emprendimiento: ${_descripcionEmprendimientoController.text}");
+  void _registrarUsuario() async {
+    setState(() => loading = true);
+
+    final result = await apiService.registerUser(
+      nombre: _nombreController.text,
+      email: _correoController.text,
+      password: _contrasenaController.text,
+      emprendimientoId:
+          _opcionSeleccionada == "unir" ? _codigoAccesoController.text : null,
+      nombreEmprendimiento: _opcionSeleccionada == "crear"
+          ? _nombreEmprendimientoController.text
+          : null,
+      descripcionEmprendimiento: _opcionSeleccionada == "crear"
+          ? _descripcionEmprendimientoController.text
+          : null,
+    );
+
+    setState(() => loading = false);
+
+    if (result.success) {
+      // Registro correcto → regresar al login
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Usuario creado correctamente")),
+      );
+      Navigator.pop(context); // vuelve a la pantalla de login
+    } else {
+      // Mostrar error de la API
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.message)),
+      );
     }
   }
 
@@ -92,7 +114,9 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           onPressed: _opcionSeleccionada == null ? null : _registrarUsuario,
-          child: const Text('Registrar'),
+          child: loading
+              ? const CircularProgressIndicator(color: Colors.white)
+              : const Text('Registrar'),
         ),
       ),
     );

@@ -22,11 +22,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void _login() async {
     setState(() => loading = true);
 
-    bool success = await apiService.login(emailCtrl.text, passCtrl.text);
+    ApiResult result = await apiService.login(emailCtrl.text, passCtrl.text);
 
     setState(() => loading = false);
 
-    if (success) {
+    if (result.success) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),

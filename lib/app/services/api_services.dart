@@ -2,21 +2,39 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ApiService {
-  static const String baseUrl = 'http://localhost:5062'; // Cambia por tu URL
+/// Resultado genérico de la API
+class ApiResult {
+  final bool success;
+  final String message;
 
-  // Ejemplo: obtener usuarios
+  ApiResult({required this.success, required this.message});
+}
+
+class ApiService {
+  static const String baseUrl = 'http://localhost:5062'; // URL de tu API
+
+  /// Obtener usuarios (requiere token si tu API lo valida con [Authorize])
   Future<List<dynamic>> getUsuarios() async {
-    final response = await http.get(Uri.parse('$baseUrl/usuarios'));
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/Usuarios'),
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "Authorization": "Bearer $token",
+      },
+    );
+
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception('Error al obtener usuarios');
+      throw Exception('Error al obtener usuarios: ${response.body}');
     }
   }
 
-  //registrar usuarios
-  Future<bool> registerUser({
+  /// Registrar usuarios
+  Future<ApiResult> registerUser({
     required String nombre,
     required String email,
     required String password,
@@ -30,11 +48,11 @@ class ApiService {
       "contrasena": password,
     };
 
-    // Caso: unirse a un emprendimiento
+    // Caso: unirse a un emprendimiento existente
     if (emprendimientoId != null) {
       body["emprendimientoId"] = emprendimientoId;
     }
-    // Caso: crear emprendimiento
+    // Caso: crear un nuevo emprendimiento
     else if (nombreEmprendimiento != null &&
         descripcionEmprendimiento != null) {
       body["nuevoEmprendimiento"] = {
@@ -49,12 +67,21 @@ class ApiService {
       body: jsonEncode(body),
     );
 
-    return response.statusCode == 201;
+    if (response.statusCode == 201) {
+      return ApiResult(success: true, message: "Usuario creado correctamente");
+    } else {
+      return ApiResult(
+        success: false,
+        message:
+            response.body.isNotEmpty ? response.body : "Error al crear usuario",
+      );
+    }
   }
 
-  Future<bool> login(String email, String password) async {
+  /// Login de usuario
+  Future<ApiResult> login(String email, String password) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/Auth/login'),
+      Uri.parse('$baseUrl/api/Auth/login'),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"email": email, "contrasena": password}),
     );
@@ -63,13 +90,18 @@ class ApiService {
       final data = jsonDecode(response.body);
       String token = data["token"];
 
-      // Guardamos token
+      // Guardar token en almacenamiento local
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString("token", token);
 
-      return true;
+      return ApiResult(success: true, message: "Login exitoso");
     } else {
-      return false;
+      return ApiResult(
+        success: false,
+        message: response.body.isNotEmpty
+            ? response.body
+            : "Error al iniciar sesión",
+      );
     }
   }
 }
