@@ -1,72 +1,63 @@
 import 'package:red_snack_gestion/app/models/producto.dart';
 import 'package:red_snack_gestion/app/models/inventario_producto.dart';
+import 'package:red_snack_gestion/app/services/api_services.dart';
+import 'package:red_snack_gestion/app/services/inventario_api.dart';
 
 class InventarioController {
-  // Lista inicial de inventario con productos
-  List<InventarioProducto> inventario = [
-    InventarioProducto(
-      id: "1",
-      inventarioId: "1",
-      productoId: "p1",
-      cantidad: 100,
-      fechaActualizacion: DateTime.now(),
-      costoActualEnStock: 50,
-      producto: Producto(
-        id: "p1",
-        nombre: 'Chips Papas',
-        descripcion: 'Papas fritas clásicas',
-        costoFabricacion: 0.50,
-        precioVenta: 1.00,
-        emprendimientoId: "1",
-      ),
-    ),
-    InventarioProducto(
-      id: "2",
-      inventarioId: "1",
-      productoId: "p2",
-      cantidad: 50,
-      fechaActualizacion: DateTime.now(),
-      costoActualEnStock: 15,
-      producto: Producto(
-        id: "p2",
-        nombre: 'Refresco Cola',
-        descripcion: 'Bebida gaseosa 350ml',
-        costoFabricacion: 0.30,
-        precioVenta: 1.20,
-        emprendimientoId: "1",
-      ),
-    ),
-    InventarioProducto(
-      id: "3",
-      inventarioId: "1",
-      productoId: "p3",
-      cantidad: 75,
-      fechaActualizacion: DateTime.now(),
-      costoActualEnStock: 60,
-      producto: Producto(
-        id: "p3",
-        nombre: 'Chocolate Bar',
-        descripcion: 'Barra de chocolate 40g',
-        costoFabricacion: 0.80,
-        precioVenta: 1.50,
-        emprendimientoId: "1",
-      ),
-    ),
-  ];
+  List<InventarioProducto> inventario = [];
+  final ApiService _api = ApiService();
 
-  /// Agregar producto al inventario
+  /// Obtener inventario desde la API
+  Future<void> cargarInventario() async {
+    final data = await _api.getInventario();
+
+    inventario = data.map<InventarioProducto>((json) {
+      final producto = Producto(
+        id: json["producto"]["id"].toString(),
+        nombre: json["producto"]["nombre"],
+        descripcion: json["producto"]["descripcion"],
+        costoFabricacion: double.tryParse(
+              json["producto"]["costoFabricacion"].toString(),
+            ) ??
+            0.0,
+        precioVenta: double.tryParse(
+              json["producto"]["precioVenta"].toString(),
+            ) ??
+            0.0,
+        emprendimientoId: json["producto"]["emprendimientoId"].toString(),
+      );
+
+      return InventarioProducto(
+        id: json["id"].toString(),
+        inventarioId: json["inventarioId"].toString(),
+        productoId: json["productoId"].toString(),
+        cantidad: json["cantidad"] ?? 0,
+        fechaActualizacion: DateTime.tryParse(
+              json["fechaActualizacion"] ?? "",
+            ) ??
+            DateTime.now(),
+        costoActualEnStock: double.tryParse(
+              json["costoActualEnStock"].toString(),
+            ) ??
+            0.0,
+        producto: producto,
+      );
+    }).toList();
+  }
+
+  /// Agregar producto localmente (puedes extenderlo con POST a la API)
   void agregarProducto(InventarioProducto inventarioProducto) {
     inventario.add(inventarioProducto);
   }
 
-  /// Eliminar producto del inventario por índice
+  /// Eliminar producto localmente (puedes extenderlo con DELETE a la API)
   void eliminarProducto(int index) {
     if (index >= 0 && index < inventario.length) {
       inventario.removeAt(index);
     }
   }
 
-  /// Actualizar cantidad de un producto en inventario
+  /// Actualizar cantidad de un producto localmente
   void actualizarInventario(String productoId, int nuevaCantidad) {
     final item = inventario.firstWhere(
       (i) => i.productoId == productoId,

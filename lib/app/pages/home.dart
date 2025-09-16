@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/controller/inventario_controller.dart';
 import 'package:red_snack_gestion/app/models/inventario_producto.dart';
 import 'package:red_snack_gestion/app/pages/chat_page.dart';
+import 'package:red_snack_gestion/app/widget/mixin.dart';
 import 'package:red_snack_gestion/app/widget/appbar.dart';
 import 'package:red_snack_gestion/app/widget/boton_flotante.dart';
 import 'package:red_snack_gestion/app/widget/grafica.dart';
@@ -15,8 +16,28 @@ class HomeScreen extends StatefulWidget {
   HomeScreenState createState() => HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> {
+// Añadimos el mixin aquí.
+class HomeScreenState extends State<HomeScreen>
+    with RefreshableMixin<HomeScreen> {
   final InventarioController inventarioController = InventarioController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Llamamos a la función de recarga del mixin.
+    refreshData();
+  }
+
+  // Ahora la lógica de recarga está en el mixin y la llamamos directamente.
+  // Puedes sobreescribir este método si necesitas lógica adicional para el home.
+  @override
+  Future<void> refreshData() async {
+    log('Refrescando datos del Home...');
+    await super.refreshData();
+    // Aquí puedes agregar tu lógica específica para actualizar los datos del home
+    // await inventarioController.fetchData();
+    log('Datos del Home refrescados.');
+  }
 
   Widget _buildAddSaleDialog(BuildContext context) {
     InventarioProducto? selectedItem;
@@ -32,33 +53,30 @@ class HomeScreenState extends State<HomeScreen> {
           // Desplegable para seleccionar el producto
           DropdownButtonFormField<InventarioProducto>(
             decoration: InputDecoration(
-              labelText: 'Seleccione el producto',
+              labelText: 'Producto',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
             value: selectedItem,
-            items: inventarioController.inventario
-                .map<DropdownMenuItem<InventarioProducto>>((item) {
-              return DropdownMenuItem<InventarioProducto>(
+            items: inventarioController.inventario.map((item) {
+              return DropdownMenuItem(
                 value: item,
                 child: Text(item.producto.nombre),
               );
             }).toList(),
             onChanged: (InventarioProducto? newValue) {
-              setState(() {
-                selectedItem = newValue;
-              });
+              selectedItem = newValue;
             },
           ),
-          const SizedBox(height: 10),
-          // Campo para ingresar la cantidad de productos
+          const SizedBox(height: 16),
+          // Campo para la cantidad
           TextField(
             controller: productCountController,
             decoration: InputDecoration(
-              labelText: 'Número de productos',
+              labelText: 'Cantidad',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
             keyboardType: TextInputType.number,
@@ -66,40 +84,34 @@ class HomeScreenState extends State<HomeScreen> {
         ],
       ),
       actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Cancelar'),
+        ),
         ElevatedButton(
           onPressed: () {
             if (selectedItem != null &&
                 productCountController.text.isNotEmpty) {
-              final int cantidadSolicitada =
+              final int cantidad =
                   int.tryParse(productCountController.text) ?? 0;
-
-              if (cantidadSolicitada > 0 &&
-                  cantidadSolicitada <= selectedItem!.cantidad) {
-                // Actualizar inventario
-                setState(() {
-                  inventarioController.actualizarInventario(
-                    selectedItem!.productoId,
-                    selectedItem!.cantidad - cantidadSolicitada,
-                  );
-                });
-
-                log('Venta registrada: ${selectedItem!.producto.nombre}, '
-                    'Cantidad: $cantidadSolicitada');
+              if (cantidad > 0) {
+                // Aquí se agregaría la lógica para guardar la venta
+                // y actualizar los datos.
+                log('Venta agregada: ${selectedItem!.producto.nombre} - Cantidad: $cantidad');
                 Navigator.of(context).pop();
               } else {
-                // Mostrar error si no hay suficiente inventario
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        'Inventario insuficiente. Disponible: ${selectedItem!.cantidad}'),
-                  ),
+                  const SnackBar(
+                      content: Text('Por favor, ingresa una cantidad válida')),
                 );
               }
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                     content: Text(
-                        'Por favor, seleccione un producto y la cantidad')),
+                        'Por favor, selecciona un producto y la cantidad')),
               );
             }
           },
@@ -114,27 +126,41 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: const GlobalAppBar(title: 'Inicio', chatPage: Chats()),
       drawer: const SideMenu(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Expanded(
-              child: TransaccionesEstado(), // <- tu widget de gráfica/estado
-            ),
-            const SizedBox(height: 5),
-            Tarjetas(
-                text:
-                    'Ventas: \$${inventarioController.totalVentas().toStringAsFixed(2)}'),
-            const SizedBox(height: 10),
-            Tarjetas(
-                text:
-                    'Gastos: \$${inventarioController.totalGastos().toStringAsFixed(2)}'),
-            const SizedBox(height: 10),
-            Tarjetas(
-                text:
-                    'Ganancias: \$${inventarioController.totalGanancias().toStringAsFixed(2)}'),
-          ],
+      body: RefreshIndicator(
+        // onRefresh ahora llama al método refreshData del mixin
+        onRefresh: refreshData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: isLoading
+                ? const SizedBox(
+                    height: 200,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Se eliminó Expanded y se agregó SizedBox para una altura fija
+                      const SizedBox(
+                        height: 300,
+                        child: TransaccionesEstado(),
+                      ),
+                      const SizedBox(height: 5),
+                      Tarjetas(
+                          text:
+                              'Ventas: \$${inventarioController.totalVentas().toStringAsFixed(2)}'),
+                      const SizedBox(height: 10),
+                      Tarjetas(
+                          text:
+                              'Gastos: \$${inventarioController.totalGastos().toStringAsFixed(2)}'),
+                      const SizedBox(height: 10),
+                      Tarjetas(
+                          text:
+                              'Ganancias: \$${inventarioController.totalGanancias().toStringAsFixed(2)}'),
+                    ],
+                  ),
+          ),
         ),
       ),
       floatingActionButton: CustomFloatingActionButton(
