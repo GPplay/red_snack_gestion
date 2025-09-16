@@ -112,52 +112,63 @@ class _InventarioScreenState extends State<InventarioScreen>
         onRefresh: refreshData,
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                itemCount: controller.inventario.length,
-                itemBuilder: (context, index) {
-                  final item = controller.inventario[index];
-                  final producto = item.producto;
-
-                  return Card(
-                    margin: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      title: Text(
-                        producto.nombre,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+            : controller.inventario.isEmpty
+                ? const Center(
+                    child: Text(
+                      "No hay nada en el inventario",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black54,
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              'Descripción: ${producto.descripcion ?? "Sin descripción"}'),
-                          Text(
-                              'Costo fabricación: \$${producto.costoFabricacion.toStringAsFixed(2)}'),
-                          Text(
-                              'Precio venta: \$${producto.precioVenta.toStringAsFixed(2)}'),
-                          Text('Cantidad: ${item.cantidad}'),
-                        ],
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          setState(() {
-                            controller.eliminarProducto(index);
-                          });
-                        },
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ProductoPage(producto: producto),
-                          ),
-                        );
-                      },
                     ),
-                  );
-                },
-              ),
+                  )
+                : ListView.builder(
+                    itemCount: controller.inventario.length,
+                    itemBuilder: (context, index) {
+                      final item = controller.inventario[index];
+                      final producto = item.producto;
+
+                      return Card(
+                        margin: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          title: Text(
+                            producto.nombre,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  'Descripción: ${producto.descripcion ?? "Sin descripción"}'),
+                              Text(
+                                  'Costo fabricación: \$${producto.costoFabricacion.toStringAsFixed(2)}'),
+                              Text(
+                                  'Precio venta: \$${producto.precioVenta.toStringAsFixed(2)}'),
+                              Text('Cantidad: ${item.cantidad}'),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                controller.eliminarProducto(index);
+                              });
+                            },
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ProductoPage(producto: producto),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
       ),
       floatingActionButton: CustomFloatingActionButton(
         onPressed: _mostrarDialogoAgregarProducto,

@@ -9,37 +9,39 @@ class InventarioController {
 
   /// Obtener inventario desde la API
   Future<void> cargarInventario() async {
-    final data = await _api.getInventario();
+    final inventarioId = await _api.getInventarioId();
+
+    if (inventarioId == null) {
+      inventario = [];
+      return;
+    }
+
+    final data = await _api.getInventarioProductos(inventarioId);
 
     inventario = data.map<InventarioProducto>((json) {
+      final productoJson = json["producto"];
+
       final producto = Producto(
-        id: json["producto"]["id"].toString(),
-        nombre: json["producto"]["nombre"],
-        descripcion: json["producto"]["descripcion"],
-        costoFabricacion: double.tryParse(
-              json["producto"]["costoFabricacion"].toString(),
-            ) ??
-            0.0,
-        precioVenta: double.tryParse(
-              json["producto"]["precioVenta"].toString(),
-            ) ??
-            0.0,
-        emprendimientoId: json["producto"]["emprendimientoId"].toString(),
+        id: productoJson["id"].toString(),
+        nombre: productoJson["nombre"] ?? "",
+        descripcion: productoJson["descripcion"] ?? "",
+        costoFabricacion:
+            double.tryParse(productoJson["costoFabricacion"].toString()) ?? 0.0,
+        precioVenta:
+            double.tryParse(productoJson["precioVenta"].toString()) ?? 0.0,
+        emprendimientoId: productoJson["emprendimientoId"].toString(),
       );
 
       return InventarioProducto(
         id: json["id"].toString(),
-        inventarioId: json["inventarioId"].toString(),
-        productoId: json["productoId"].toString(),
+        inventarioId: inventarioId,
+        productoId: producto.id,
         cantidad: json["cantidad"] ?? 0,
-        fechaActualizacion: DateTime.tryParse(
-              json["fechaActualizacion"] ?? "",
-            ) ??
-            DateTime.now(),
-        costoActualEnStock: double.tryParse(
-              json["costoActualEnStock"].toString(),
-            ) ??
-            0.0,
+        fechaActualizacion:
+            DateTime.tryParse(json["fechaActualizacion"] ?? "") ??
+                DateTime.now(),
+        costoActualEnStock:
+            double.tryParse(json["costoActualEnStock"].toString()) ?? 0.0,
         producto: producto,
       );
     }).toList();
