@@ -10,7 +10,7 @@ extension InventarioApi on ApiService {
     final token = prefs.getString("token");
 
     final response = await http.get(
-      Uri.parse('${ApiService.baseUrl}/api/InventarioProducto'), // ✅ CORRECTO
+      Uri.parse('${ApiService.baseUrl}/api/InventarioProductos'), // ✅ CORRECTO
       headers: {
         "Content-Type": "application/json",
         if (token != null) "Authorization": "Bearer $token",
