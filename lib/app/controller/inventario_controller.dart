@@ -9,14 +9,7 @@ class InventarioController {
 
   /// Obtener inventario desde la API
   Future<void> cargarInventario() async {
-    final inventarioId = await _api.getInventarioId();
-
-    if (inventarioId == null) {
-      inventario = [];
-      return;
-    }
-
-    final data = await _api.getInventarioProductos(inventarioId);
+    final data = await _api.getInventarioProductos();
 
     inventario = data.map<InventarioProducto>((json) {
       final productoJson = json["producto"];
@@ -34,7 +27,7 @@ class InventarioController {
 
       return InventarioProducto(
         id: json["id"].toString(),
-        inventarioId: inventarioId,
+        inventarioId: json["inventarioId"].toString(),
         productoId: producto.id,
         cantidad: json["cantidad"] ?? 0,
         fechaActualizacion:
