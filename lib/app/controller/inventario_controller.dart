@@ -12,29 +12,24 @@ class InventarioController {
     final data = await _api.getInventarioProductos();
 
     inventario = data.map<InventarioProducto>((json) {
-      final productoJson = json["producto"];
-
+      // Como tu API devuelve un JSON simplificado, adaptamos el mapeo
       final producto = Producto(
-        id: productoJson["id"].toString(),
-        nombre: productoJson["nombre"] ?? "",
-        descripcion: productoJson["descripcion"] ?? "",
-        costoFabricacion:
-            double.tryParse(productoJson["costoFabricacion"].toString()) ?? 0.0,
-        precioVenta:
-            double.tryParse(productoJson["precioVenta"].toString()) ?? 0.0,
-        emprendimientoId: productoJson["emprendimientoId"].toString(),
+        id: json["productoNombre"]?.toString() ??
+            "", // usamos el nombre como id simbólico
+        nombre: json["productoNombre"] ?? "",
+        descripcion: "", // tu API no lo devuelve
+        costoFabricacion: 0.0, // tu API no lo devuelve
+        precioVenta: 0.0, // tu API no lo devuelve
+        emprendimientoId: json["emprendimientoId"]?.toString() ?? "",
       );
 
       return InventarioProducto(
-        id: json["id"].toString(),
-        inventarioId: json["inventarioId"].toString(),
+        id: json["inventarioId"]?.toString() ?? "",
+        inventarioId: json["inventarioId"]?.toString() ?? "",
         productoId: producto.id,
-        cantidad: json["cantidad"] ?? 0,
-        fechaActualizacion:
-            DateTime.tryParse(json["fechaActualizacion"] ?? "") ??
-                DateTime.now(),
-        costoActualEnStock:
-            double.tryParse(json["costoActualEnStock"].toString()) ?? 0.0,
+        cantidad: json["cantidadEnStock"] ?? 0,
+        fechaActualizacion: DateTime.now(), // no viene en la respuesta
+        costoActualEnStock: 0.0, // no viene en la respuesta
         producto: producto,
       );
     }).toList();

@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:red_snack_gestion/app/services/api_services.dart';
 
 extension InventarioApi on ApiService {
-  /// Obtener productos del inventario
+  /// Obtener productos del inventario (ya vienen filtrados por el JWT en el backend)
   Future<List<dynamic>> getInventarioProductos() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("token");
@@ -20,15 +20,13 @@ extension InventarioApi on ApiService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else if (response.statusCode == 404) {
-      // No hay productos en inventario
-      return [];
+      return []; // inventario vacío
     } else {
-      throw Exception(
-          'Error al obtener productos del inventario: ${response.body}');
+      throw Exception('Error al obtener productos: ${response.body}');
     }
   }
 
-  /// Crear un nuevo producto y registrarlo en inventario
+  /// Crear producto (y automáticamente se guarda en inventario)
   Future<bool> crearProducto({
     required String nombre,
     String? descripcion,
@@ -61,36 +59,50 @@ extension InventarioApi on ApiService {
     }
   }
 
-  /// Añadir stock a un producto existente
-  Future<bool> agregarStock({
+  /// Actualizar stock de un producto existente
+  Future<bool> actualizarStock({
     required String productoId,
-    required int cantidad,
+    required int nuevaCantidad,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("token");
 
-    final response = await http.post(
-      Uri.parse('${ApiService.baseUrl}/api/InventarioProducto'),
+    final response = await http.put(
+      Uri.parse('${ApiService.baseUrl}/api/Productos/$productoId'),
       headers: {
         "Content-Type": "application/json",
         if (token != null) "Authorization": "Bearer $token",
       },
       body: jsonEncode({
-        "productoId": productoId,
-        "cantidad": cantidad,
+        "id": productoId,
+        "cantidadInicial": nuevaCantidad, // el backend lo actualiza
       }),
     );
 
-    if (response.statusCode == 201) {
-      return true; // Stock añadido correctamente
-    } else if (response.statusCode == 409) {
-      throw Exception(
-          "El producto ya existe en el inventario. Usa PUT para actualizar la cantidad.");
+    if (response.statusCode == 204) {
+      return true;
     } else {
-      throw Exception('Error al agregar stock: ${response.body}');
+      throw Exception('Error al actualizar stock: ${response.body}');
+    }
+  }
+
+  /// Eliminar producto (también lo quita del inventario del usuario)
+  Future<bool> eliminarProducto(String productoId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+
+    final response = await http.delete(
+      Uri.parse('${ApiService.baseUrl}/api/Productos/$productoId'),
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 204) {
+      return true;
+    } else {
+      throw Exception('Error al eliminar producto: ${response.body}');
     }
   }
 }
-
-
-//${ApiService.baseUrl}

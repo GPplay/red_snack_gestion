@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/controller/inventario_controller.dart';
-import 'package:red_snack_gestion/app/models/producto.dart';
-import 'package:red_snack_gestion/app/models/inventario_producto.dart';
 import 'package:red_snack_gestion/app/pages/chat_page.dart';
 import 'package:red_snack_gestion/app/pages/producto_page.dart';
+import 'package:red_snack_gestion/app/services/api_services.dart';
+import 'package:red_snack_gestion/app/services/inventario_api.dart';
 import 'package:red_snack_gestion/app/widget/appbar.dart';
 import 'package:red_snack_gestion/app/widget/boton_flotante.dart';
 import 'package:red_snack_gestion/app/widget/formulario.dart';
@@ -19,6 +19,7 @@ class InventarioScreen extends StatefulWidget {
 class _InventarioScreenState extends State<InventarioScreen>
     with RefreshableMixin {
   final InventarioController controller = InventarioController();
+  final ApiService _api = ApiService();
 
   @override
   Future<void> refreshData() async {
@@ -78,27 +79,28 @@ class _InventarioScreenState extends State<InventarioScreen>
       final int cantidad = int.tryParse(resultado['cantidad'] ?? '0') ?? 0;
 
       if (nombre.isNotEmpty && costo > 0 && precio > 0 && cantidad > 0) {
-        final producto = Producto(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          nombre: nombre,
-          descripcion: descripcion,
-          costoFabricacion: costo,
-          precioVenta: precio,
-          emprendimientoId: "1",
-        );
+        try {
+          // 🚀 Crear producto en el backend
+          final ok = await _api.crearProducto(
+            nombre: nombre,
+            descripcion: descripcion,
+            costoFabricacion: costo,
+            precioVenta: precio,
+            cantidadInicial: cantidad,
+          );
 
-        final inventarioProducto = InventarioProducto(
-          id: DateTime.now().microsecondsSinceEpoch.toString(),
-          inventarioId: "1",
-          productoId: producto.id,
-          cantidad: cantidad,
-          fechaActualizacion: DateTime.now(),
-          costoActualEnStock: costo * cantidad,
-          producto: producto,
-        );
-
-        controller.agregarProducto(inventarioProducto);
-        setState(() {});
+          if (ok) {
+            // ✅ Refrescar inventario desde la API
+            await refreshData();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Producto creado correctamente")),
+            );
+          }
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error al crear producto: $e")),
+          );
+        }
       }
     }
   }
@@ -150,10 +152,26 @@ class _InventarioScreenState extends State<InventarioScreen>
                           ),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              setState(() {
-                                controller.eliminarProducto(index);
-                              });
+                            onPressed: () async {
+                              try {
+                                final ok =
+                                    await _api.eliminarProducto(producto.id);
+
+                                if (ok) {
+                                  await refreshData(); // refresca la lista desde el backend
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            "Producto eliminado correctamente")),
+                                  );
+                                }
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          "Error al eliminar producto: $e")),
+                                );
+                              }
                             },
                           ),
                           onTap: () {
