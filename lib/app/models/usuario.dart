@@ -1,38 +1,30 @@
 class Usuario {
-  int id; // Clave primaria
-  String nombre; // Nombre del usuario
-  String email; // Correo electrónico
-  String contrasena; // Contraseña
-  String codigoAcceso; // Código de acceso
+  String id;
+  String nombre;
+  String email;
+  String contrasena;
+  String emprendimientoId;
 
-  // Constructor
-  Usuario({
-    required this.id,
-    required this.nombre,
-    required this.email,
-    required this.contrasena,
-    required this.codigoAcceso,
-  });
+  Usuario(
+      {required this.id,
+      required this.nombre,
+      required this.email,
+      required this.contrasena,
+      required this.emprendimientoId});
 
-  // Método para convertir a JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'nombre': nombre,
-      'email': email,
-      'contrasena': contrasena,
-      'codigoAcceso': codigoAcceso,
-    };
-  }
+  factory Usuario.fromJson(Map<String, dynamic> json) => Usuario(
+        id: json['id'],
+        nombre: json['nombre'],
+        email: json['email'],
+        contrasena: json['contrasena'],
+        emprendimientoId: json['emprendimientoId'],
+      );
 
-  // Método para crear una instancia de Usuario desde un JSON
-  factory Usuario.fromJson(Map<String, dynamic> json) {
-    return Usuario(
-      id: json['id'],
-      nombre: json['nombre'],
-      email: json['email'],
-      contrasena: json['contrasena'],
-      codigoAcceso: json['codigoAcceso'],
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'nombre': nombre,
+        'email': email,
+        'contrasena': contrasena,
+        'emprendimientoId': emprendimientoId,
+      };
 }

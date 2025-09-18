@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/pages/chat_page.dart';
 import 'package:red_snack_gestion/app/widget/appbar.dart';
+import 'package:red_snack_gestion/app/widget/contrasena.dart';
+import 'package:red_snack_gestion/app/widget/correo.dart';
+import 'package:red_snack_gestion/app/widget/perfil.dart';
 
 class UsuarioPage extends StatefulWidget {
   const UsuarioPage({super.key});
@@ -10,17 +13,13 @@ class UsuarioPage extends StatefulWidget {
 }
 
 class _UsuarioPageState extends State<UsuarioPage> {
-  bool _showPasswordFields =
-      false; // Estado para mostrar/ocultar campos de contraseña
-  bool _showEmailFields =
-      false; // Estado para mostrar/ocultar campos de actualización de correo
+  bool _showPasswordFields = false;
+  bool _showEmailFields = false;
 
   final TextEditingController _oldPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-
-  // Controlador para el correo electrónico
   final TextEditingController _newEmailController = TextEditingController();
 
   @override
@@ -35,29 +34,7 @@ class _UsuarioPageState extends State<UsuarioPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Imagen de perfil y nombre
-              Center(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.purple[100],
-                      child: const Icon(
-                        Icons.person,
-                        size: 60,
-                        color: Colors.purple,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'NOMBRE',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const ImagenPerfil(),
               const SizedBox(height: 30),
               // Información del usuario
               Container(
@@ -96,8 +73,7 @@ class _UsuarioPageState extends State<UsuarioPage> {
                           ),
                           onPressed: () {
                             setState(() {
-                              _showPasswordFields =
-                                  !_showPasswordFields; // Mostrar/ocultar campos de contraseña
+                              _showPasswordFields = !_showPasswordFields;
                             });
                           },
                         ),
@@ -106,45 +82,10 @@ class _UsuarioPageState extends State<UsuarioPage> {
                     // Campos para cambiar la contraseña
                     Visibility(
                       visible: _showPasswordFields,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 10),
-                          TextField(
-                            controller: _oldPasswordController,
-                            obscureText: true,
-                            decoration: const InputDecoration(
-                              labelText: 'Antigua contraseña',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          TextField(
-                            controller: _newPasswordController,
-                            obscureText: true,
-                            decoration: const InputDecoration(
-                              labelText: 'Nueva contraseña',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          TextField(
-                            controller: _confirmPasswordController,
-                            obscureText: true,
-                            decoration: const InputDecoration(
-                              labelText: 'Confirmar nueva contraseña',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Aquí puedes validar y cambiar la contraseña
-                              // Acciones para cambiar contraseña
-                            },
-                            child: const Text('Guardar contraseña'),
-                          ),
-                        ],
+                      child: PasswordFields(
+                        oldPasswordController: _oldPasswordController,
+                        newPasswordController: _newPasswordController,
+                        confirmPasswordController: _confirmPasswordController,
                       ),
                     ),
                     const Divider(),
@@ -163,8 +104,7 @@ class _UsuarioPageState extends State<UsuarioPage> {
                           ),
                           onPressed: () {
                             setState(() {
-                              _showEmailFields =
-                                  !_showEmailFields; // Mostrar/ocultar campos de actualización de correo
+                              _showEmailFields = !_showEmailFields;
                             });
                           },
                         ),
@@ -173,26 +113,8 @@ class _UsuarioPageState extends State<UsuarioPage> {
                     // Campos para actualizar el correo
                     Visibility(
                       visible: _showEmailFields,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 10),
-                          TextField(
-                            controller: _newEmailController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nuevo correo electrónico',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Aquí puedes validar y actualizar el correo
-                              // Acciones para actualizar correo
-                            },
-                            child: const Text('Guardar correo'),
-                          ),
-                        ],
+                      child: EmailFields(
+                        emailController: _newEmailController,
                       ),
                     ),
                   ],

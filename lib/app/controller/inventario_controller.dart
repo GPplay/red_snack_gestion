@@ -1,63 +1,86 @@
 import 'package:red_snack_gestion/app/models/producto.dart';
-import 'package:http/http.dart' as http;
+import 'package:red_snack_gestion/app/models/inventario_producto.dart';
+import 'package:red_snack_gestion/app/services/api_services.dart';
+import 'package:red_snack_gestion/app/services/inventario_api.dart';
 
 class InventarioController {
-  // Lista de productos inicializada con algunos valores por defecto
-  List<Producto> productos = [
-    Producto(
-      id: 1,
-      nombre: 'Chips Papas',
-      cantidadInventario: 100,
-      precioUnitario: 1.00,
-      costoFabricacion: 0.50,
-      emprendimientoId: 1,
-    ),
-    Producto(
-      id: 2,
-      nombre: 'Refresco Cola',
-      cantidadInventario: 50,
-      precioUnitario: 1.20,
-      costoFabricacion: 0.30,
-      emprendimientoId: 1,
-    ),
-    Producto(
-      id: 3,
-      nombre: 'Chocolate Bar',
-      cantidadInventario: 75,
-      precioUnitario: 1.50,
-      costoFabricacion: 0.80,
-      emprendimientoId: 1,
-    ),
-  ];
+  List<InventarioProducto> inventario = [];
+  final ApiService _api = ApiService();
 
-  /// Función para eliminar un producto de la lista
+  /// Obtener inventario desde la API
+  Future<void> cargarInventario() async {
+    final data = await _api.getInventarioProductos();
+
+    inventario = data.map<InventarioProducto>((json) {
+      final productoJson = json["producto"];
+
+      final producto = Producto(
+        id: productoJson["id"].toString(),
+        nombre: productoJson["nombre"] ?? "",
+        descripcion: productoJson["descripcion"] ?? "",
+        costoFabricacion:
+            double.tryParse(productoJson["costoFabricacion"].toString()) ?? 0.0,
+        precioVenta:
+            double.tryParse(productoJson["precioVenta"].toString()) ?? 0.0,
+        emprendimientoId: productoJson["emprendimientoId"].toString(),
+      );
+
+      return InventarioProducto(
+        id: json["id"].toString(),
+        inventarioId: json["inventarioId"].toString(),
+        productoId: producto.id,
+        cantidad: json["cantidad"] ?? 0,
+        fechaActualizacion:
+            DateTime.tryParse(json["fechaActualizacion"] ?? "") ??
+                DateTime.now(),
+        costoActualEnStock:
+            double.tryParse(json["costoActualEnStock"].toString()) ?? 0.0,
+        producto: producto,
+      );
+    }).toList();
+  }
+
+  /// Agregar producto localmente (puedes extenderlo con POST a la API)
+  void agregarProducto(InventarioProducto inventarioProducto) {
+    inventario.add(inventarioProducto);
+  }
+
+  /// Eliminar producto localmente (puedes extenderlo con DELETE a la API)
   void eliminarProducto(int index) {
-    if (index >= 0 && index < productos.length) {
-      productos.removeAt(index);
+    if (index >= 0 && index < inventario.length) {
+      inventario.removeAt(index);
     }
   }
 
-  /// Función para agregar un producto a la lista
-  void agregarProducto(Producto producto) {
-    productos.add(producto);
+  /// Actualizar cantidad de un producto localmente
+  void actualizarInventario(String productoId, int nuevaCantidad) {
+    final item = inventario.firstWhere(
+      (i) => i.productoId == productoId,
+      orElse: () => throw Exception("Producto no encontrado"),
+    );
+
+    item.cantidad = nuevaCantidad;
+    item.fechaActualizacion = DateTime.now();
   }
 
-  /// Función para verificar si una imagen tiene dimensiones mayores a 500px
-  Future<bool> esImagenMayorA500px(String url) async {
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        int? width = int.tryParse(response.headers['content-width'] ?? '0');
-        int? height = int.tryParse(response.headers['content-height'] ?? '0');
-        if (width != null && height != null && (width > 500 || height > 500)) {
-          return true;
-        }
-      }
-    } catch (e) {
-      // Captura de errores y se asume que no se puede mostrar la imagen
-      // ignore: avoid_print
-      print('Error verificando la imagen: $e');
-    }
-    return false;
+  /// Calcular el total de ventas (precioVenta * cantidad en inventario)
+  double totalVentas() {
+    return inventario.fold(
+      0,
+      (sum, item) => sum + (item.producto.precioVenta * item.cantidad),
+    );
+  }
+
+  /// Calcular el total de gastos de fabricación
+  double totalGastos() {
+    return inventario.fold(
+      0,
+      (sum, item) => sum + (item.producto.costoFabricacion * item.cantidad),
+    );
+  }
+
+  /// Calcular ganancias (Ventas - Gastos)
+  double totalGanancias() {
+    return totalVentas() - totalGastos();
   }
 }

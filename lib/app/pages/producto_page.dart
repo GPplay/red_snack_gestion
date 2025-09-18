@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:red_snack_gestion/app/models/producto.dart';
+import 'package:red_snack_gestion/app/widget/formulario.dart';
 
 class ProductoPage extends StatefulWidget {
   const ProductoPage({super.key, required Producto producto});
@@ -9,9 +10,6 @@ class ProductoPage extends StatefulWidget {
 }
 
 class _ProductoPageState extends State<ProductoPage> {
-  // Controlador para el campo de número a agregar
-  final TextEditingController _numberController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,52 +96,45 @@ class _ProductoPageState extends State<ProductoPage> {
   }
 
   // Función para mostrar el diálogo de agregar a inventario
-  void _showAddInventoryDialog(BuildContext context) {
-    showDialog(
+  void _showAddInventoryDialog(BuildContext context) async {
+    // Llamamos al formulario dinámico
+    final resultado = await FormularioDinamico.mostrarFormulario(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          contentPadding: const EdgeInsets.all(20.0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Agregar a Inventario",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _numberController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: "Agregar número",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Acción al agregar el número al inventario
-                  Navigator.of(context).pop(); // Cerrar el diálogo
-                },
-                style: ElevatedButton.styleFrom(
-                  // ignore: deprecated_member_use
-                  backgroundColor: Colors.red, // Color del botón
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                ),
-                child: const Text("Agregar",
-                    style: TextStyle(color: Colors.white)),
-              ),
-            ],
-          ),
-        );
-      },
+      titulo: "Agregar a Inventario",
+      preguntas: [
+        {
+          'nombre':'cantidad', // Nombre del campo para identificar el resultado
+          'label': 'Agregar número',
+          'tipo': TextInputType.number,
+          'hint': 'Ingresa una cantidad',
+        },
+      ],
+      textoBoton: "Agregar", // Texto del botón de acción
+      colorBoton: Colors.red, // Color del botón
+      colorFondo: Colors.white, // Fondo del formulario
+      colorTitulo: Colors.black, // Color del título
     );
+
+    // Validar y procesar los resultados del formulario
+    if (resultado != null) {
+      final String? cantidadStr = resultado['cantidad'];
+      if (cantidadStr != null && cantidadStr.isNotEmpty) {
+        final int cantidad = int.tryParse(cantidadStr) ?? 0;
+
+        // Aquí puedes manejar la cantidad ingresada, por ejemplo:
+        // ignore: avoid_print
+        print("Cantidad agregada al inventario: $cantidad");
+
+        // Lógica adicional (e.g., actualizar inventario, llamar a controladores, etc.)
+        // ...
+      } else {
+        // Manejo de error si no se ingresa un valor válido
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text("Por favor, ingresa una cantidad válida.")),
+        );
+      }
+    }
   }
 }
