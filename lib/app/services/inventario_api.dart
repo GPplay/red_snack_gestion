@@ -26,6 +26,26 @@ extension InventarioApi on ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> getProductoById(String productoId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+
+    final response = await http.get(
+      Uri.parse('${ApiService.baseUrl}/api/Productos/$productoId'),
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception(
+          'Error al obtener producto $productoId: ${response.body}');
+    }
+  }
+
   /// Crear producto (y automáticamente se guarda en inventario)
   Future<bool> crearProducto({
     required String nombre,

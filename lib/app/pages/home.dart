@@ -58,6 +58,7 @@ class HomeScreenState extends State<HomeScreen>
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
+            // ignore: deprecated_member_use
             value: selectedItem,
             items: inventarioController.inventario.map((item) {
               return DropdownMenuItem(
