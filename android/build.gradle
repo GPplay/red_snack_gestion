@@ -1,13 +1,37 @@
+// android/build.gradle
+
+// 1. BUILDSCRIPT {} (DEBE IR PRIMERO)
+// Definimos las versiones de los plugins en el classpath aquí para evitar conflictos.
 buildscript {
-    ext.kotlin_version = '1.7.10'
+    ext.kotlin_version = '1.9.24' // Mantenemos la versión de Kotlin aquí
     repositories {
         google()
         mavenCentral()
     }
-
     dependencies {
+        // AGP: Re-introducimos el classpath para AGP (Versión 8.5.1)
+        classpath 'com.android.tools.build:gradle:8.6.1'
+        // KOTLIN: Re-introducimos el classpath para Kotlin (Usando la variable ext.kotlin_version)
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
+}
+
+// 2. PLUGINS {} (VA DESPUÉS)
+// Usamos el bloque plugins moderno para aplicar los plugins.
+// Ya no necesitamos la versión aquí, ya que se definió en el classpath de arriba.
+plugins {
+    id 'com.android.application' apply false
+    id 'org.jetbrains.kotlin.android' apply false
+}
+
+
+// 3. CONFIGURACIÓN DEL PROYECTO Y TAREAS
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
 }
 
 allprojects {
@@ -15,14 +39,6 @@ allprojects {
         google()
         mavenCentral()
     }
-}
-
-rootProject.buildDir = '../build'
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(':app')
 }
 
 tasks.register("clean", Delete) {
